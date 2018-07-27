@@ -106,6 +106,17 @@ describe('SessionService', () => {
       expect(session.content).to.eql({ some: { other: 'data' } });
     });
 
+    it("raises a deprecation when written back to the session's content", function() {
+      let warnings = [];
+      registerDeprecationHandler((message, options, next) => {
+        warnings.push(message);
+        next(message, options);
+      });
+      sessionService.set('data.some', { other: 'data' });
+
+      expect(warnings[0]).to.eq('Ember Simple Auth: Setting session data on the "session" service as a property is deprecated. Use the "update" method instead.');
+    });
+
     it('can be set with Ember.set', function() {
       set(sessionService, 'data.emberSet', 'ember-set-data');
 

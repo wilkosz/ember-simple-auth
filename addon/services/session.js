@@ -126,6 +126,11 @@ export default Service.extend(Evented, {
   set(key, value) {
     const setsSessionData = SESSION_DATA_KEY_PREFIX.test(key);
     if (setsSessionData) {
+      deprecate(`Ember Simple Auth: Setting session data on the "session" service as a property is deprecated. Use the "update" method instead.`, false, {
+        id: 'ember-simple-auth.session.session-data-setting',
+        until: '2.0.0',
+        url: 'https://github.com/simplabs/ember-simple-auth' // TODO: add proper link here!
+      });
       const sessionDataKey = `session.${key.replace(SESSION_DATA_KEY_PREFIX, '')}`;
       return this._super(sessionDataKey, value);
     } else {
