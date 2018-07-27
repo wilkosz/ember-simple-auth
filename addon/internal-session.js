@@ -7,6 +7,7 @@ import { deprecate } from '@ember/application/deprecations';
 import { set } from '@ember/object';
 import { debug, assert } from '@ember/debug';
 import { getOwner } from '@ember/application';
+
 const assign = emberAssign || merge;
 
 export default ObjectProxy.extend(Evented, {
@@ -149,6 +150,12 @@ export default ObjectProxy.extend(Evented, {
   },
 
   setUnknownProperty(key, value) {
+    deprecate(`Ember Simple Auth: relying on automatic persistence of arbitrary session data is deprecated. Use the "session" service's "update" method instead.`, false, {
+      id: 'ember-simple-auth.session.session-data-auto-persistence',
+      until: '2.0.0',
+      url: 'https://github.com/simplabs/ember-simple-auth' // TODO: add proper link here!
+    });
+
     assert('"authenticated" is a reserved key used by Ember Simple Auth!', key !== 'authenticated');
     let result = this._super(key, value);
     if (!(/^_/).test(key)) {

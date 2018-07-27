@@ -1,5 +1,6 @@
 import RSVP from 'rsvp';
 import { next } from '@ember/runloop';
+import { registerDeprecationHandler } from '@ember/debug';
 import { describe, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -521,16 +522,24 @@ describe('InternalSession', () => {
       });
 
       describe('when the property is not private (does not start with an "_")', function() {
-        beforeEach(function() {
-          session.set('some', 'property');
-        });
-
         it('persists its content in the store', function() {
+          session.set('some', 'property');
           return store.restore().then((properties) => {
             delete properties.authenticator;
 
             expect(properties).to.eql({ some: 'property', authenticated: {} });
           });
+        });
+
+        it('causes a deprecation', function() {
+          let warnings = [];
+          registerDeprecationHandler((message, options, next) => {
+            warnings.push(message);
+            next(message, options);
+          });
+          session.set('some', 'property');
+
+          expect(warnings[0]).to.eq(`Ember Simple Auth: relying on automatic persistence of arbitrary session data is deprecated. Use the "session" service's "update" method instead.`);
         });
       });
     });
